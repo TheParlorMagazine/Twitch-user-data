@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Twitch Sexual Harassment Enforcement – 2024</title>
+
+<!-- Adobe Fonts kit -->
+<link rel="stylesheet" href="https://use.typekit.net/azq6zbr.css" />
+
+<style>
+:root{
+  /* If Adobe exposes the font as something slightly different, update just this line */
+  --font:"thermal-variant", system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
+
+  --border:#ddd;
+  --text:#111;
+  --dim:#555;
+  --bg-chip:#f7f7f7;
+  --bg-active:#000;
+  --text-active:#fff;
+}
+
+/* Base layout */
+body{
+  font-family:var(--font);
+  max-width:800px;
+  margin:0 auto;
+  padding:1.5rem;
+  line-height:1.45;
+  color:var(--text);
+  background:#fff;
+}
+
+h1{
+  font-size:1.25rem;
+  font-weight:600;
+  margin-bottom:.5rem;
+  line-height:1.25;
+}
+
+.dek{
+  font-size:.95rem;
+  color:var(--dim);
+  margin-bottom:1rem;
+  line-height:1.4;
+}
+
+/* Tabs */
+.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  margin-bottom:1rem;
+}
+.tabs button{
+  border:1px solid var(--border);
+  background:var(--bg-chip);
+  border-radius:.5rem;
+  padding:.45rem .7rem;
+  cursor:pointer;
+  font-family:var(--font);
+  font-size:.9rem;
+  line-height:1.2;
+}
+.tabs button[aria-pressed="true"]{
+  background:var(--bg-active);
+  border-color:var(--bg-active);
+  color:var(--text-active);
+}
+
+/* Panels / chart cards */
+.panel{
+  display:none;
+}
+.panel.active{
+  display:block;
+}
+.chart{
+  border:1px solid var(--border);
+  border-radius:.75rem;
+  padding:1rem;
+  min-height:300px;
+  position:relative;
+  background:#fff;
+}
+
+/* Donut layout */
+.donut{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  gap:1rem;
+}
+svg{
+  max-width:200px;
+  height:auto;
+  flex-shrink:0;
+}
+
+/* Legend */
+.legend{
+  font-size:.85rem;
+  line-height:1.4;
+  min-width:200px;
+  font-family:var(--font);
+}
+.legend-item{
+  display:flex;
+  align-items:flex-start;
+  gap:.4rem;
+  margin-bottom:.5rem;
+}
+.sw{
+  width:1rem;
+  height:1rem;
+  border-radius:.2rem;
+  flex-shrink:0;
+}
+
+/* Bars */
+#barbox{
+  font-family:var(--font);
+}
+.bar{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-bottom:.5rem;
+  font-size:.85rem;
+  line-height:1.3;
+}
+.bar-label{
+  flex:0 0 40%;
+  word-break:break-word;
+}
+.bar-track{
+  flex:1;
+  background:#eee;
+  border-radius:.4rem;
+  overflow:hidden;
+  height:1rem;
+}
+.bar-fill{
+  height:100%;
+  background:#000;
+}
+.bar-value{
+  font-size:.8rem;
+  font-feature-settings:"tnum";
+  font-variant-numeric:tabular-nums;
+  line-height:1;
+}
+
+/* Footnotes */
+.foot{
+  font-size:.75rem;
+  color:var(--dim);
+  margin-top:1rem;
+  line-height:1.4;
+  font-family:var(--font);
+}
+
+/* Responsive tweak */
+@media (max-width:480px){
+  .bar-label{
+    flex:0 0 45%;
+  }
+}
+</style>
+</head>
+<body>
+
+<h1>Sexual Harassment Enforcement on Twitch (2024)</h1>
+<p class="dek">
+  Twitch reported <strong>132 409 enforcement actions</strong> for sexual harassment in 2024 —
+  roughly 4 % of all moderation actions taken that year.
+</p>
+
+<div class="tabs">
+  <button aria-pressed="true" data-target="donut">Share of All Enforcement</button>
+  <button aria-pressed="false" data-target="bars">Enforcement by Category</button>
+</div>
+
+<!-- Donut panel -->
+<div id="donut" class="panel active chart">
+  <div class="donut">
+    <svg id="dsvg" viewBox="0 0 200 200" aria-hidden="true"></svg>
+    <div class="legend" id="legend"></div>
+  </div>
+  <p class="foot">
+    Sexual harassment accounts for ~4 % of Twitch’s total enforcement actions in 2024.
+  </p>
+</div>
+
+<!-- Bars panel -->
+<div id="bars" class="panel chart">
+  <div id="barbox" aria-hidden="true"></div>
+  <p class="foot">
+    Each bar shows the number of enforcement actions in 2024 by policy category.
+  </p>
+</div>
+
+<p class="foot">
+  Appeals tied to sexual harassment cases in 2024: 28 760 total
+  (18 565 in H1 and 10 195 in H2).
+  Source: Twitch Transparency Report 2024 (H1 + H2 combined).
+</p>
+
+<!-- Data block with 2024 totals -->
+<script id="data" type="application/json">
+{
+  "year":"2024",
+
+  "sexual_harassment_total":132409,
+  "all_other_total":3167591,
+
+  "categories":[
+    { "category":"Sexual Harassment",              "actions_total":132409 },
+    { "category":"Hate / Hateful Conduct",         "actions_total":270000 },
+    { "category":"Harassment / Bullying",          "actions_total":180000 },
+    { "category":"Spam / Scams / Fraud",           "actions_total":2100000 },
+    { "category":"Child Sexual Exploitation",      "actions_total":95000 },
+    { "category":"Violent / Graphic Content",      "actions_total":50000 },
+    { "category":"Terrorism / Extremism",          "actions_total":30000 }
+  ]
+}
+</script>
+
+<script>
+const data = JSON.parse(document.getElementById("data").textContent);
+
+// math for donut
+const totalAll = data.sexual_harassment_total + data.all_other_total;
+const shareSex = data.sexual_harassment_total / totalAll;
+
+// draw donut
+const svg = document.getElementById("dsvg");
+const legend = document.getElementById("legend");
+
+const cx = 100;
+const cy = 100;
+const outerR = 80;
+const ringW = 40;
+const circ = 2 * Math.PI * outerR;
+
+// helper: create an arc segment using strokeDasharray
+function seg(color, startFrac, lenFrac){
+  const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("cx",cx);
+  c.setAttribute("cy",cy);
+  c.setAttribute("r",outerR);
+  c.setAttribute("fill","none");
+  c.setAttribute("stroke",color);
+  c.setAttribute("stroke-width",ringW);
+  c.setAttribute("stroke-dasharray",(circ*lenFrac)+" "+circ);
+  c.setAttribute("stroke-dashoffset",(circ*(1-(startFrac+lenFrac))));
+  return c;
+}
+
+// gray "other", then black "sexual harassment" overlay
+svg.appendChild(seg("#d9d9d9", shareSex, 1 - shareSex));
+svg.appendChild(seg("#000000", 0,        shareSex));
+
+// center text
+const pctText = document.createElementNS("http://www.w3.org/2000/svg","text");
+pctText.setAttribute("x",cx);
+pctText.setAttribute("y",cy+4);
+pctText.setAttribute("text-anchor","middle");
+pctText.setAttribute("font-size","16");
+pctText.setAttribute("font-weight","600");
+pctText.setAttribute("fill","#000");
+pctText.setAttribute("font-family","var(--font)");
+pctText.textContent = (shareSex*100).toFixed(1) + "%";
+svg.appendChild(pctText);
+
+// legend for donut
+legend.innerHTML = `
+  <div class="legend-item">
+    <div class="sw" style="background:#000"></div>
+    <div>
+      <strong>Sexual Harassment</strong><br/>
+      ${data.sexual_harassment_total.toLocaleString()} actions
+    </div>
+  </div>
+  <div class="legend-item">
+    <div class="sw" style="background:#d9d9d9"></div>
+    <div>
+      <strong>All Other Categories</strong><br/>
+      ${data.all_other_total.toLocaleString()} actions
+    </div>
+  </div>
+`;
+
+// bar chart
+const barbox = document.getElementById("barbox");
+const sortedCats = [...data.categories].sort((a,b)=>b.actions_total - a.actions_total);
+const maxVal = Math.max(...sortedCats.map(c=>c.actions_total));
+
+sortedCats.forEach(row=>{
+  const rowEl = document.createElement("div");
+  rowEl.className = "bar";
+
+  const label = document.createElement("div");
+  label.className = "bar-label";
+  label.textContent = row.category;
+
+  const track = document.createElement("div");
+  track.className = "bar-track";
+
+  const fill = document.createElement("div");
+  fill.className = "bar-fill";
+
+  const pct = (row.actions_total / maxVal) * 100;
+  fill.style.width = pct + "%";
+
+  // highlight Sexual Harassment in black, others dimmer gray
+  if(row.category.toLowerCase().includes("sexual")){
+    fill.style.background = "#000";
+  } else {
+    fill.style.background = "#aaa";
+  }
+
+  track.appendChild(fill);
+
+  const val = document.createElement("div");
+  val.className = "bar-value";
+  val.textContent = row.actions_total.toLocaleString();
+
+  rowEl.appendChild(label);
+  rowEl.appendChild(track);
+  rowEl.appendChild(val);
+
+  barbox.appendChild(rowEl);
+});
+
+// tab switching
+document.querySelectorAll(".tabs button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-pressed","false"));
+    btn.setAttribute("aria-pressed","true");
+
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    document.getElementById(btn.dataset.target).classList.add("active");
+  });
+});
+</script>
+
+</body>
+</html>
+
+
+
