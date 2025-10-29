@@ -3,14 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Twitch Sexual Harassment Enforcement – 2024</title>
+<title>Sexual Harassment Enforcement on Twitch (2024)</title>
 
 <!-- Adobe Fonts kit -->
 <link rel="stylesheet" href="https://use.typekit.net/azq6zbr.css" />
 
 <style>
 :root{
+  /* updated: use the real Adobe font family name */
   --font:"thermal-variable", system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
+
   --border:#ddd;
   --text:#111;
   --dim:#555;
@@ -19,7 +21,6 @@
   --text-active:#fff;
 }
 
-/* Base layout */
 body{
   font-family:var(--font);
   max-width:800px;
@@ -44,7 +45,6 @@ h1{
   line-height:1.4;
 }
 
-/* Tabs */
 .tabs{
   display:flex;
   flex-wrap:wrap;
@@ -67,13 +67,9 @@ h1{
   color:var(--text-active);
 }
 
-/* Panels / chart cards */
-.panel{
-  display:none;
-}
-.panel.active{
-  display:block;
-}
+.panel{display:none;}
+.panel.active{display:block;}
+
 .chart{
   border:1px solid var(--border);
   border-radius:.75rem;
@@ -83,7 +79,6 @@ h1{
   background:#fff;
 }
 
-/* Donut layout */
 .donut{
   display:flex;
   flex-wrap:wrap;
@@ -97,7 +92,6 @@ svg{
   flex-shrink:0;
 }
 
-/* Legend */
 .legend{
   font-size:.85rem;
   line-height:1.4;
@@ -117,10 +111,7 @@ svg{
   flex-shrink:0;
 }
 
-/* Bars */
-#barbox{
-  font-family:var(--font);
-}
+#barbox{font-family:var(--font);}
 .bar{
   display:flex;
   align-items:center;
@@ -151,7 +142,6 @@ svg{
   line-height:1;
 }
 
-/* Footnotes */
 .foot{
   font-size:.75rem;
   color:var(--dim);
@@ -160,11 +150,8 @@ svg{
   font-family:var(--font);
 }
 
-/* Responsive tweak */
 @media (max-width:480px){
-  .bar-label{
-    flex:0 0 45%;
-  }
+  .bar-label{flex:0 0 45%;}
 }
 </style>
 </head>
@@ -202,11 +189,11 @@ svg{
 
 <p class="foot">
   Appeals tied to sexual harassment cases in 2024: 28 760 total
-  (18 565 in H1 and 10 195 in H2).
-  Source: Twitch Transparency Report 2024 (H1 + H2 combined).
+  (18 565 in H1 and 10 195 in H2). Source: Twitch Transparency Report 2024
+  (H1 + H2 combined).
 </p>
 
-<!-- Data block with 2024 totals -->
+<!-- DATA -->
 <script id="data" type="application/json">
 {
   "year":"2024",
@@ -215,14 +202,14 @@ svg{
   "all_other_total":3167591,
 
   "categories":[
-    { "category":"Sexual Harassment",              "actions_total":132409 },
-  { category: "Adult Nudity / Pornography and Sexual Conduct", actions_total: 77456 },
-    { "category":"Hate / Hateful Conduct",         "actions_total":270000 },
-    { "category":"Harassment / Bullying",          "actions_total":180000 },
-    { "category":"Spam / Scams / Fraud",           "actions_total":2100000 },
-    { "category":"Child Sexual Exploitation",      "actions_total":95000 },
-    { "category":"Violent / Graphic Content",      "actions_total":50000 },
-    { "category":"Terrorism / Extremism",          "actions_total":30000 }
+    { "category":"Spam / Scams / Fraud",                               "actions_total":2097276 },
+    { "category":"Hate / Hateful Conduct",                              "actions_total":272005 },
+    { "category":"Harassment / Bullying",                               "actions_total":180000 },
+    { "category":"Sexual Harassment",                                   "actions_total":132409 },
+    { "category":"Adult Nudity / Pornography / Sexual Conduct",         "actions_total":77456 },
+    { "category":"Child Sexual Exploitation",                           "actions_total":94951 },
+    { "category":"Violent / Graphic Content",                           "actions_total":50631 },
+    { "category":"Terrorism / Extremism",                               "actions_total":29835 }
   ]
 }
 </script>
@@ -230,7 +217,7 @@ svg{
 <script>
 const data = JSON.parse(document.getElementById("data").textContent);
 
-// math for donut
+// donut math
 const totalAll = data.sexual_harassment_total + data.all_other_total;
 const shareSex = data.sexual_harassment_total / totalAll;
 
@@ -244,7 +231,6 @@ const outerR = 80;
 const ringW = 40;
 const circ = 2 * Math.PI * outerR;
 
-// helper: create an arc segment using strokeDasharray
 function seg(color, startFrac, lenFrac){
   const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
   c.setAttribute("cx",cx);
@@ -258,11 +244,10 @@ function seg(color, startFrac, lenFrac){
   return c;
 }
 
-// gray "other", then black "sexual harassment" overlay
+// gray for "other", black for "sexual harassment"
 svg.appendChild(seg("#d9d9d9", shareSex, 1 - shareSex));
 svg.appendChild(seg("#000000", 0,        shareSex));
 
-// center text
 const pctText = document.createElementNS("http://www.w3.org/2000/svg","text");
 pctText.setAttribute("x",cx);
 pctText.setAttribute("y",cy+4);
@@ -274,7 +259,6 @@ pctText.setAttribute("font-family","var(--font)");
 pctText.textContent = (shareSex*100).toFixed(1) + "%";
 svg.appendChild(pctText);
 
-// legend for donut
 legend.innerHTML = `
   <div class="legend-item">
     <div class="sw" style="background:#000"></div>
@@ -314,11 +298,14 @@ sortedCats.forEach(row=>{
   const pct = (row.actions_total / maxVal) * 100;
   fill.style.width = pct + "%";
 
-  // highlight Sexual Harassment in black, others dimmer gray
-  if(row.category.toLowerCase().includes("sexual")){
+  if(row.category.toLowerCase().includes("sexual harassment")){
     fill.style.background = "#000";
+  } else if (row.category.toLowerCase().includes("adult nudity")
+          || row.category.toLowerCase().includes("pornography")
+          || row.category.toLowerCase().includes("sexual conduct")) {
+    fill.style.background = "#444";
   } else {
-    fill.style.background = "#aaa";
+    fill.style.background = "#bbb";
   }
 
   track.appendChild(fill);
@@ -348,6 +335,7 @@ document.querySelectorAll(".tabs button").forEach(btn=>{
 
 </body>
 </html>
+
 
 
 
