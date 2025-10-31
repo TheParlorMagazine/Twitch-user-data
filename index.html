@@ -21,6 +21,18 @@
   --text-active:#fff;
 }
 
+/* 🔽 Compact mode (enabled with ?compact=1) */
+:root.compact .chart { padding:.75rem; }
+:root.compact .dek { margin-bottom:.6rem; }
+:root.compact .tabs { margin-bottom:.6rem; }
+:root.compact .bar { margin-bottom:.35rem; }
+:root.compact .bar-track { height:.8rem; }
+:root.compact h1 { font-size:1.1rem; }
+
+html, body{
+  overflow:hidden; /* prevent internal scrollbars inside the iframe */
+}
+
 body{
   font-family:var(--font);
   max-width:800px;
@@ -197,10 +209,8 @@ svg{
 <script id="data" type="application/json">
 {
   "year":"2024",
-
   "sexual_harassment_total":132409,
   "all_other_total":3167591,
-
   "categories":[
     { "category":"Spam / Scams / Fraud",                               "actions_total":2097276 },
     { "category":"Hate / Hateful Conduct",                              "actions_total":272005 },
@@ -215,46 +225,42 @@ svg{
 </script>
 
 <script>
+/* Enable compact mode if ?compact=1 is present */
+(function(){
+  if (new URLSearchParams(location.search).get('compact') === '1') {
+    document.documentElement.classList.add('compact');
+  }
+})();
+
+// Parse data
 const data = JSON.parse(document.getElementById("data").textContent);
 
-// donut math
+// Donut math
 const totalAll = data.sexual_harassment_total + data.all_other_total;
 const shareSex = data.sexual_harassment_total / totalAll;
 
-// draw donut
+// Draw donut
 const svg = document.getElementById("dsvg");
 const legend = document.getElementById("legend");
 
-const cx = 100;
-const cy = 100;
-const outerR = 80;
-const ringW = 40;
-const circ = 2 * Math.PI * outerR;
+const cx = 100, cy = 100, outerR = 80, ringW = 40, circ = 2 * Math.PI * outerR;
 
 function seg(color, startFrac, lenFrac){
   const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
-  c.setAttribute("cx",cx);
-  c.setAttribute("cy",cy);
-  c.setAttribute("r",outerR);
-  c.setAttribute("fill","none");
-  c.setAttribute("stroke",color);
-  c.setAttribute("stroke-width",ringW);
+  c.setAttribute("cx",cx); c.setAttribute("cy",cy); c.setAttribute("r",outerR);
+  c.setAttribute("fill","none"); c.setAttribute("stroke",color); c.setAttribute("stroke-width",ringW);
   c.setAttribute("stroke-dasharray",(circ*lenFrac)+" "+circ);
   c.setAttribute("stroke-dashoffset",(circ*(1-(startFrac+lenFrac))));
   return c;
 }
 
-// gray for "other", black for "sexual harassment"
-svg.appendChild(seg("#d9d9d9", shareSex, 1 - shareSex));
-svg.appendChild(seg("#000000", 0,        shareSex));
+svg.appendChild(seg("#d9d9d9", shareSex, 1 - shareSex)); // other
+svg.appendChild(seg("#000000", 0,        shareSex));     // sexual harassment
 
 const pctText = document.createElementNS("http://www.w3.org/2000/svg","text");
-pctText.setAttribute("x",cx);
-pctText.setAttribute("y",cy+4);
-pctText.setAttribute("text-anchor","middle");
-pctText.setAttribute("font-size","16");
-pctText.setAttribute("font-weight","600");
-pctText.setAttribute("fill","#000");
+pctText.setAttribute("x",cx); pctText.setAttribute("y",cy+4);
+pctText.setAttribute("text-anchor","middle"); pctText.setAttribute("font-size","16");
+pctText.setAttribute("font-weight","600"); pctText.setAttribute("fill","#000");
 pctText.setAttribute("font-family","var(--font)");
 pctText.textContent = (shareSex*100).toFixed(1) + "%";
 svg.appendChild(pctText);
@@ -262,41 +268,25 @@ svg.appendChild(pctText);
 legend.innerHTML = `
   <div class="legend-item">
     <div class="sw" style="background:#000"></div>
-    <div>
-      <strong>Sexual Harassment</strong><br/>
-      ${data.sexual_harassment_total.toLocaleString()} actions
-    </div>
+    <div><strong>Sexual Harassment</strong><br/>${data.sexual_harassment_total.toLocaleString()} actions</div>
   </div>
   <div class="legend-item">
     <div class="sw" style="background:#d9d9d9"></div>
-    <div>
-      <strong>All Other Categories</strong><br/>
-      ${data.all_other_total.toLocaleString()} actions
-    </div>
+    <div><strong>All Other Categories</strong><br/>${data.all_other_total.toLocaleString()} actions</div>
   </div>
 `;
 
-// bar chart
+// Bar chart
 const barbox = document.getElementById("barbox");
 const sortedCats = [...data.categories].sort((a,b)=>b.actions_total - a.actions_total);
 const maxVal = Math.max(...sortedCats.map(c=>c.actions_total));
 
 sortedCats.forEach(row=>{
-  const rowEl = document.createElement("div");
-  rowEl.className = "bar";
-
-  const label = document.createElement("div");
-  label.className = "bar-label";
-  label.textContent = row.category;
-
-  const track = document.createElement("div");
-  track.className = "bar-track";
-
-  const fill = document.createElement("div");
-  fill.className = "bar-fill";
-
-  const pct = (row.actions_total / maxVal) * 100;
-  fill.style.width = pct + "%";
+  const rowEl = document.createElement("div"); rowEl.className = "bar";
+  const label = document.createElement("div"); label.className = "bar-label"; label.textContent = row.category;
+  const track = document.createElement("div"); track.className = "bar-track";
+  const fill = document.createElement("div"); fill.className = "bar-fill";
+  const pct = (row.actions_total / maxVal) * 100; fill.style.width = pct + "%";
 
   if(row.category.toLowerCase().includes("sexual harassment")){
     fill.style.background = "#000";
@@ -309,28 +299,43 @@ sortedCats.forEach(row=>{
   }
 
   track.appendChild(fill);
-
-  const val = document.createElement("div");
-  val.className = "bar-value";
-  val.textContent = row.actions_total.toLocaleString();
-
-  rowEl.appendChild(label);
-  rowEl.appendChild(track);
-  rowEl.appendChild(val);
-
+  const val = document.createElement("div"); val.className = "bar-value"; val.textContent = row.actions_total.toLocaleString();
+  rowEl.appendChild(label); rowEl.appendChild(track); rowEl.appendChild(val);
   barbox.appendChild(rowEl);
 });
 
-// tab switching
+// Tabs
 document.querySelectorAll(".tabs button").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-pressed","false"));
     btn.setAttribute("aria-pressed","true");
-
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     document.getElementById(btn.dataset.target).classList.add("active");
+    sendHeight(); // update height when panels change
   });
 });
+
+/* 🔽 Auto-resize the iframe height (postMessage to parent) */
+function sendHeight(){
+  var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+  // add small buffer so shadows/borders don't clip
+  window.parent && window.parent.postMessage({ type:'parlor-embed-size', height: h + 12 }, '*');
+}
+
+// On load + on resize/content changes
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', sendHeight);
+} else { sendHeight(); }
+
+window.addEventListener('load', sendHeight);
+window.addEventListener('resize', sendHeight);
+
+// React to layout changes (legend wraps, etc.)
+if ('ResizeObserver' in window) {
+  new ResizeObserver(sendHeight).observe(document.body);
+} else {
+  setInterval(sendHeight, 600);
+}
 </script>
 
 </body>
